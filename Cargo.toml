@@ -1,0 +1,11 @@
+[package]
+name = "miner-test"
+version = "0.1.0"
+authors = ["Nikita Chebykin <nikita@chebyk.in>"]
+
+[dependencies]
+ethcore = {git = 'https://github.com/paritytech/parity', tag = "v1.9.5"}
+ethereum-types = "0.2"
+
+[patch."https://github.com/paritytech/wasm-utils"]
+wasm-utils = {git = 'https://github.com/chebykin/wasm-utils'}
