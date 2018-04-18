@@ -1265,6 +1265,7 @@ dependencies = [
 name = "miner-test"
 version = "0.1.0"
 dependencies = [
+ "clap 2.31.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "ethcore 1.9.0 (git+https://github.com/paritytech/parity?tag=v1.9.6)",
  "ethcore-bigint 0.2.1 (git+https://github.com/paritytech/parity?tag=v1.9.6)",
  "ethcore-io 1.9.0 (git+https://github.com/paritytech/parity?tag=v1.9.6)",
