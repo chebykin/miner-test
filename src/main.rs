@@ -8,6 +8,7 @@ extern crate kvdb_memorydb;
 
 #[macro_use]
 extern crate log;
+extern crate clap;
 
 use ethcore::client::{Client, ClientConfig};
 use ethcore::miner::{Miner, MinerService, TransactionImportResult};
@@ -16,7 +17,8 @@ use ethcore::transaction::{Action, PendingTransaction, SignedTransaction, Transa
 use std::sync::Arc;
 use io::*;
 use std::time;
-use std::thread;
+use clap::App;
+use clap::Arg;
 
 fn transaction_with_chain_id(count: u64, chain_id: Option<u64>) -> Vec<SignedTransaction> {
     // 0x252Dae0A4b9d9b80F504F6418acd2d364C0c59cD
@@ -41,7 +43,7 @@ fn transaction_with_chain_id(count: u64, chain_id: Option<u64>) -> Vec<SignedTra
         txs.push(t.sign(&secret, chain_id))
     }
 
-    println!("Generation of {:?} txs took {:?} seconds", count, now.elapsed().as_secs());
+    println!("Generation of {:?} txs took {} seconds", count, now.elapsed().as_secs());
     return txs;
 }
 
@@ -50,9 +52,27 @@ fn new_db() -> Arc<::kvdb::KeyValueDB> {
 }
 
 fn main() {
-    trace!(target: "app", "hello");
+    let matches = App::new("My Super Program")
+        .version("1.9.6")
+        .author("Nikita Chebykin <nikita@chebyk.in")
+        .about("Parity miner test")
+        .arg(Arg::with_name("count")
+            .short("c")
+            .long("count")
+            .value_name("COUNT")
+            .help("Sets # of txs to insert")
+            .takes_value(true))
+        .arg(Arg::with_name("logs")
+            .short("l")
+            .long("logs")
+            .value_name("LOGS")
+            .help("logs")
+            .takes_value(true))
+        .get_matches();
 
-    let count = 2222;
+    let count = matches.value_of("count").unwrap().parse().unwrap();
+    println!("Value for count: {}", count);
+
     ::ethcore_logger::init_log();
     let bytes: &[u8] = include_bytes!("../res/spec.json");
     let spec = Spec::load(&::std::env::temp_dir(), bytes).expect("invalid chain spec");
@@ -76,12 +96,9 @@ fn main() {
             &unwrapped_client, PendingTransaction::new(tx, None));
 
         assert_eq!(res.unwrap(), TransactionImportResult::Current);
-    }
+    };
 
-    println!("Adding transactions took {:?} seconds", now.elapsed().as_secs());
+    println!("Adding transactions took {} seconds", now.elapsed().as_secs());
 
-    let ten_seconds = time::Duration::from_secs(10);
-    thread::sleep(ten_seconds);
-
-    assert_eq!(unwrapped_client.miner().pending_transactions().len(), 2222);
+    assert_eq!(unwrapped_client.miner().pending_transactions().len(), count as usize);
 }
