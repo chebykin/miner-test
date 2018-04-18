@@ -5,7 +5,15 @@ authors = ["Nikita Chebykin <nikita@chebyk.in>"]
 
 [dependencies]
 ethcore = {git = 'https://github.com/paritytech/parity', tag = "v1.9.6"}
+ethkey = {git = 'https://github.com/paritytech/parity', tag = "v1.9.6"}
+ethcore-bigint = {git = 'https://github.com/paritytech/parity', tag = "v1.9.6"}
+ethcore-logger = {git = 'https://github.com/paritytech/parity', tag = "v1.9.6"}
+ethcore-io = {git = 'https://github.com/paritytech/parity', tag = "v1.9.6"}
+kvdb = {git = 'https://github.com/paritytech/parity', tag = "v1.9.6"}
+kvdb-memorydb = {git = 'https://github.com/paritytech/parity', tag = "v1.9.6"}
 ethereum-types = "0.2"
+rustc-hex = "1.0"
+log = "0.3"
 
 [patch."https://github.com/paritytech/hidapi-rs"]
 hidapi = {git = "https://github.com/chebykin/hidapi-rs", branch = 'fix/macos-target'}
