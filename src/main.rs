@@ -19,6 +19,13 @@ use io::*;
 use std::time;
 use clap::App;
 use clap::Arg;
+use ethcore::miner::MinerOptions;
+use std::time::Duration;
+use ethcore::miner::GasLimit;
+use ethcore::miner::PrioritizationStrategy;
+use ethcore::miner::PendingSet;
+use ethcore::miner::Banning;
+use ethcore::miner::GasPricer;
 
 fn transaction_with_chain_id(count: u64, chain_id: Option<u64>) -> Vec<SignedTransaction> {
     // 0x252Dae0A4b9d9b80F504F6418acd2d364C0c59cD
@@ -79,11 +86,30 @@ fn main() {
 
     let client_db = new_db();
 
-    let miner = Miner::with_spec(&spec);
+    let miner = Miner::new(MinerOptions {
+        new_work_notify: Vec::new(),
+        force_sealing: false,
+        reseal_on_external_tx: false,
+        reseal_on_own_tx: false,
+        reseal_on_uncle: false,
+        reseal_min_period: Duration::from_secs(5),
+        reseal_max_period: Duration::from_secs(120),
+        tx_gas_limit: 4_700_000.into(),
+        tx_queue_size: 65_536,
+        tx_queue_memory_limit: 131_072.into(),
+        tx_queue_gas_limit: GasLimit::None,
+        tx_queue_strategy: PrioritizationStrategy::GasFactorAndGasPrice,
+        pending_set: PendingSet::SealingOrElseQueue,
+        work_queue_size: 5,
+        enable_resubmission: true,
+        tx_queue_banning: Banning::Disabled,
+        refuse_service_transactions: false,
+        infinite_pending_block: false,
+    }, GasPricer::new_fixed(0u64.into()), &spec, None);
     let client = Client::new(ClientConfig::default(),
                              &spec,
                              client_db,
-                             Arc::new(miner),
+                             miner,
                              IoChannel::disconnected(),).unwrap();
     let unwrapped_client = Arc::try_unwrap(client).ok().expect("should unwrap");
 
